@@ -1,0 +1,910 @@
+basePath: /api
+definitions:
+  LoginInput:
+    properties:
+      password:
+        type: string
+      phone:
+        type: string
+    required:
+    - password
+    - phone
+    type: object
+  LoginResponse:
+    properties:
+      access_token:
+        type: string
+      expired_date:
+        type: string
+      refresh_token:
+        type: string
+      type:
+        type: string
+    type: object
+  RegisterInput:
+    properties:
+      fio:
+        type: string
+      iin:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+    required:
+    - fio
+    - iin
+    - password
+    - phone
+    type: object
+  ViolationCreateInput:
+    properties:
+      lat:
+        type: number
+      lon:
+        type: number
+      category_id:
+        type: integer
+      phone:
+        type: string
+      comment:
+        type: string
+      address:
+        type: string
+      date:
+        type: string
+        format: date
+      city_id:
+        type: integer
+  ViolationRejectInput:
+    properties:
+      violation_id:
+        type: integer
+      reason:
+        type: string
+  VolunteerContractInput:
+    properties:
+      fio:
+        type: string
+  ProtocolInput:
+    properties:
+      violation_id:
+        type:  integer
+      article_id:
+        type: integer
+      mrp:
+        type: integer
+      violator:
+        type: object
+        properties:
+          iin:
+            type: string
+          address:
+            type: string
+          birthday:
+            type: string
+            format: datetime
+      car:
+        type: object
+        properties:
+          number:
+            type: string
+          passport:
+            type: string
+          mark:
+            type: string
+          color:
+            type: string
+  FileResponse:
+    type: object
+    properties:
+      url:
+        type: string
+      uploaded_at:
+        type: string
+        format: datetime
+  UserResponse:
+    properties:
+      fio:
+        type: string
+      id:
+        type: integer
+      iin:
+        type: string
+      phone:
+        type: string
+      type:
+        type: string
+      birthday:
+        type: string
+        format: datetime
+      avatar:
+        $ref: '#/definitions/FileResponse'
+      wallet:
+        type: object
+        properties:
+          balance:
+            type: number
+          bonus:
+            type: number
+    type: object
+  ViolationCategoryResponse:
+    type: array
+    items:
+      type: object
+      properties:
+          id:
+            type: integer
+          title:
+            type: string
+          created_at:
+            type: string
+          updated_at:
+            type: string
+  CitiesResponse:
+    type: array
+    items:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        created_at:
+          type: string
+        updated_at:
+          type: string
+  ArticlesResponse:
+    type: array
+    items:
+      type: object
+      properties:
+        id:
+          type: integer
+        number:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        mrp:
+          type: integer
+        price:
+            type: integer
+  ViolationResponse:
+    type: object
+    properties:
+      id:
+        type: integer
+      volunteer_id:
+          type: integer
+      category:
+        type: object
+        properties:
+          id:
+            type: integer
+          title:
+            type: string
+      city:
+        type: object
+        properties:
+          id:
+            type: integer
+          title:
+            type: string
+      location:
+        type: object
+        properties:
+          lat:
+            type: number
+          lon:
+            type: number
+      phone:
+        type: string
+      address:
+        type: string
+      comment:
+        type: string
+      date:
+        type: string
+      status:
+        type: string
+      reason:
+        type: string
+  ProtocolResponse:
+    type: object
+    properties:
+      id:
+        type: integer
+      volunteer_id:
+        type: integer
+      violation:
+        type: object
+        properties:
+          id:
+            type: integer
+          volunteer_id:
+            type: integer
+          category:
+            type: object
+            properties:
+              id:
+                type: integer
+              title:
+                type: string
+          city:
+            type: object
+            properties:
+              id:
+                type: integer
+              title:
+                type: string
+          location:
+            type: object
+            properties:
+              lat:
+                type: number
+              lon:
+                type: number
+          phone:
+            type: string
+          address:
+            type: string
+          comment:
+            type: string
+          date:
+            type: string
+      article:
+        type: object
+        properties:
+          id:
+            type: integer
+          number:
+            type: integer
+          title:
+            type: string
+          description:
+            type: string
+          mrp:
+            type: integer
+          price:
+            type: integer
+      violator:
+        type: object
+        properties:
+          iin:
+            type: string
+          address:
+            type: string
+          birthday:
+            type: string
+            format: date
+      car:
+        type: object
+        properties:
+          number:
+            type: string
+          passport:
+            type: string
+          mark:
+            type: string
+          color:
+            type: string
+      mrp:
+        type: integer
+      price:
+        type: integer
+      status:
+        type: string
+  ProtocolsResponse:
+    type: array
+    items:
+      $ref: "#/definitions/ProtocolResponse"
+  ViolationsResponse:
+    type: array
+    items:
+      type: object
+      properties:
+        schema:
+          $ref: "#/definitions/ViolationResponse"
+  DefaultResponse:
+    type: object
+    properties:
+      message:
+        type: string
+      data:
+        type: object
+host: api.paydal.kz
+schemes:
+  - "https"
+info:
+
+  title: Paydal API документация
+  version: "1.0"
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
+    description: >-
+      Передайте полученный токен при авторизаций "Bearer {token}".
+security:
+  - bearerAuth: []
+paths:
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Логин
+      parameters:
+      - description: Login Data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/LoginInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/LoginResponse'
+      summary: Логин с использованием phone и password
+      tags:
+      - Авторизация
+  /p/cities:
+    get:
+      security:
+        - Bearer: [ ]
+      consumes:
+        - application/json
+      description: Получить список городов
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                $ref: '#/definitions/CitiesResponse'
+      summary: Получить список городов
+      tags:
+        - Город
+  /p/user:
+    get:
+      security:
+        - Bearer: [ ]
+      consumes:
+      - application/json
+      description: Получить пользотваля
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                $ref: '#/definitions/UserResponse'
+      summary:  Получить пользотваля
+      tags:
+      - Пользователь
+  /p/user/avatar/upload:
+    put:
+      consumes:
+        - application/json
+      description:  Загрузка аватар юзера
+      security:
+        - Bearer: [ ]
+      parameters:
+        - in: formData
+          description: Аватар
+          name: avatar
+          type: file
+          required: true
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                type: object
+      summary: Загрузка аватар юзера
+      tags:
+        - Пользователь
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Регистрация  нового пользователя
+      parameters:
+      - description: Register Data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/RegisterInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              message:
+                type: string
+      summary: Регистрация
+      tags:
+      - Авторизация
+  /refresh-token:
+    post:
+      consumes:
+        - application/json
+      description: Получить токен с refresh
+      parameters:
+        - in: query
+          description: Refresh Token
+          name: refresh_token
+          type: string
+          required: true
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                $ref: '#/definitions/LoginResponse'
+      summary: Получить токен с refresh
+      tags:
+        - Авторизация
+  /p/volunteer/contract/create:
+            post:
+              consumes:
+                - application/json
+              description: Создать договор Волонтера
+              security:
+                - Bearer: [ ]
+              parameters:
+                - in: formData
+                  description: ФИО
+                  name: fio
+                  type: string
+                  required: true
+                - in: formData
+                  description: Город ID
+                  name: city_id
+                  type: integer
+                  required: true
+                - in: formData
+                  description: Лицевая сторона
+                  name: front_image
+                  type: file
+                  required: true
+                - in: formData
+                  description: Задняя сторона
+                  name: back_image
+                  type: file
+                  required: true
+                - in: formData
+                  description: Ваше фото с Лицевой стороной
+                  name: front_with_avatar
+                  type: file
+                  required: true
+                - in: formData
+                  description: Ваше фото с задней стороной
+                  name: back_with_avatar
+                  type: file
+                  required: true
+              produces:
+                - application/json
+              responses:
+                "200":
+                  description: OK
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                      data:
+                        type: object
+              summary: Создать договор Волонтера
+              tags:
+                - Волонтер
+  /p/volunteer/contract/status:
+    get:
+      security:
+        - Bearer: [ ]
+      consumes:
+        - application/json
+      description: Получить статус договора
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                $ref: '#/definitions/VolunteerContractInput'
+      summary: Получить статус договора
+      tags:
+        - Волонтер
+  /p/violation/categories:
+    get:
+      security:
+        - Bearer: [ ]
+      consumes:
+        - application/json
+      description: Получить список категорий шарушений
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                $ref: '#/definitions/ViolationCategoryResponse'
+      summary: Получить список категорий шарушений
+      tags:
+        - Нарушение
+  /p/violation/create:
+    post:
+      consumes:
+        - application/json
+      description: Добавить заявку на нарушение
+      security:
+        - Bearer: [ ]
+      parameters:
+        - description: Login Data
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: '#/definitions/ViolationCreateInput'
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                $ref: '#/definitions/ViolationResponse'
+      summary: Добавить заявку на нарушение
+      tags:
+        - Нарушение
+  /p/violation/upload/media:
+    post:
+      consumes:
+        - application/json
+      description: Загрузка медиа нарушений
+      security:
+        - Bearer: [ ]
+      parameters:
+        - in: formData
+          description: ID нарушений
+          name: violation_id
+          type: integer
+          required: true
+        - in: formData
+          description: Медиа
+          name: media
+          type: file
+          required: true
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                type: object
+      summary: Загрузка медиа нарушений
+      tags:
+        - Нарушение
+  /p/violation/{id}:
+    get:
+      security:
+        - Bearer: [ ]
+      parameters:
+        - in: path
+          description: ID
+          name: id
+          type: integer
+          required: true
+      consumes:
+        - application/json
+      description: Получить нарушение по ID
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                $ref: '#/definitions/ViolationResponse'
+      summary: Получить нарушение по ID
+      tags:
+        - Нарушение
+  /p/police/violation/{id}:
+    get:
+      security:
+        - Bearer: [ ]
+      parameters:
+        - in: path
+          description: ID
+          name: id
+          type: integer
+          required: true
+      consumes:
+        - application/json
+      description: Получить нарушение по ID для полиций
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                $ref: '#/definitions/ViolationResponse'
+      summary: Получить нарушение по ID  для полиций
+      tags:
+        - Нарушение
+  /p/police/violations:
+    get:
+      security:
+        - Bearer: [ ]
+      consumes:
+        - application/json
+      description: Список нарушений для полиций
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                $ref: '#/definitions/ViolationsResponse'
+      summary:  Список нарушений для полиций
+      tags:
+        - Нарушение
+  /violations:
+    get:
+      security:
+        - Bearer: [ ]
+      parameters:
+        - in: query
+          description: Lat
+          name: lat
+          type: number
+          required: true
+        - in: query
+          description: Lon
+          name: lon
+          type: number
+          required: true
+        - in: query
+          description: Дистанция
+          name: dist
+          type: number
+          required: true
+      consumes:
+        - application/json
+      description: Список нарушений в карте
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                $ref: '#/definitions/ViolationsResponse'
+      summary: Список нарушений в карте
+      tags:
+        - Нарушение
+  /p/violation/reject:
+    put:
+      consumes:
+        - application/json
+      description: Отклонить заявку на нарушение
+      security:
+        - Bearer: [ ]
+      parameters:
+        - description: Request Data
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: '#/definitions/ViolationRejectInput'
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/DefaultResponse'
+      summary: Отклонить заявку на нарушение
+      tags:
+        - Нарушение
+  /article/search:
+    get:
+      parameters:
+        - in: query
+          description:  Поиск
+          name: search
+          type: string
+          required: false
+        - in: query
+          description: Поиск
+          name: price_sort
+          type: string
+          enum: [asc, desc]
+          required: false
+      consumes:
+        - application/json
+      description: Получить список cтати
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                $ref: '#/definitions/ArticlesResponse'
+      summary: Получить список cтати
+      tags:
+        - Статья
+  /p/police/protocol/create:
+    post:
+      consumes:
+        - application/json
+      description: Создать протокол
+      security:
+        - Bearer: [ ]
+      parameters:
+        - description: Login Data
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: '#/definitions/ProtocolInput'
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                $ref: '#/definitions/ProtocolResponse'
+      summary:  Создать протокол
+      tags:
+        - Протокол
+  /penalty/search:
+    get:
+      security:
+        - Bearer: [ ]
+      parameters:
+        - in: query
+          description: ИИН
+          name: iin
+          type: string
+          required: true
+      consumes:
+        - application/json
+      description: Получить штрафы по ИИН
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                $ref: '#/definitions/ProtocolsResponse'
+      summary: Получить штрафы по ИИН
+      tags:
+        - Протокол
+  /p/volunteer/violation/applications:
+    get:
+      security:
+        - Bearer: [ ]
+      consumes:
+        - application/json
+      description: Получить нарушений который волонтер отправил
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                $ref: '#/definitions/ViolationsResponse'
+      summary: Получить нарушений который волонтер отправил
+      tags:
+        - Пользователь
+  /p/police/protocols:
+    get:
+      security:
+        - Bearer: [ ]
+      consumes:
+        - application/json
+      description: Получить протоколы который заполнял полиция
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                $ref: '#/definitions/ProtocolsResponse'
+      summary: Получить протоколы который заполнял полиция
+      tags:
+        - Пользователь
+swagger: "2.0"
